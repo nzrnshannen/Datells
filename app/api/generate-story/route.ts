@@ -15,7 +15,7 @@ export async function POST(req: Request) {
     }
 
     const { object } = await generateObject({
-      model: google('gemini-1.5-pro'),
+      model: google('gemini-1.5-flash'),
       schema: storySchema,
       system: `You are an expert Data Scientist and Executive Storyteller. You analyze dataset summary statistics and generate a cohesive, interactive data story for a dashboard.`,
       prompt: `
@@ -36,8 +36,11 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ story: object });
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error generating story:', error);
-    return NextResponse.json({ error: 'Failed to generate story. Make sure your GOOGLE_GENERATIVE_AI_API_KEY is set in .env.local' }, { status: 500 });
+    return NextResponse.json(
+      { error: error.message || 'Failed to generate story. Make sure your GOOGLE_GENERATIVE_AI_API_KEY is set and valid.' },
+      { status: 500 }
+    );
   }
 }
