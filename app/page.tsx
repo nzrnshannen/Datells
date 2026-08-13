@@ -6,6 +6,7 @@ import { DashboardStory } from "@/components/dashboard-story";
 import { profileDataset } from "@/lib/profiler";
 import { StoryData } from "@/lib/schema";
 import { Database, Sparkles } from "lucide-react";
+import MagicRings from "@/components/MagicRings";
 
 export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
@@ -50,19 +51,39 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-slate-950 text-slate-200 selection:bg-emerald-500/30 overflow-x-hidden">
-      {/* Background Grid Pattern */}
-      <div className="fixed inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none" />
-      
-      {/* Radial fade for the grid */}
-      <div className="fixed left-0 right-0 top-0 -z-10 m-auto h-[400px] w-[400px] rounded-full bg-emerald-500 opacity-20 blur-[120px] pointer-events-none" />
+    <main className="min-h-screen bg-slate-950 text-slate-200 selection:bg-purple-500/30 overflow-x-hidden relative">
+      <div className="fixed inset-0 z-0 pointer-events-none">
+        <MagicRings
+          color="#A855F7"
+          colorTwo="#6366F1"
+          ringCount={6}
+          speed={1}
+          attenuation={10}
+          lineThickness={2}
+          baseRadius={0.35}
+          radiusStep={0.1}
+          scaleRate={0.1}
+          opacity={1}
+          blur={0}
+          noiseAmount={0.1}
+          rotation={0}
+          ringGap={1.5}
+          fadeIn={0.7}
+          fadeOut={0.5}
+          followMouse={false}
+          mouseInfluence={0.2}
+          hoverScale={1.2}
+          parallax={0.05}
+          clickBurst={false}
+        />
+      </div>
 
       <div className="relative z-10 container mx-auto px-4 py-8 md:py-16 flex flex-col items-center">
         {!story ? (
           <div className="w-full max-w-4xl mx-auto flex flex-col items-center mt-12 md:mt-24">
             <div className="inline-flex items-center justify-center p-4 bg-slate-900 border border-slate-800 rounded-2xl mb-8 shadow-2xl relative">
-              <div className="absolute inset-0 bg-emerald-500/20 blur-xl rounded-full" />
-              <Database className="w-10 h-10 text-emerald-400 relative z-10" />
+              <div className="absolute inset-0 bg-purple-500/20 blur-xl rounded-full" />
+              <Database className="w-10 h-10 text-purple-400 relative z-10" />
             </div>
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-center mb-6 bg-clip-text text-transparent bg-gradient-to-br from-slate-100 to-slate-500">
               Datells
@@ -83,8 +104,8 @@ export default function Home() {
           <div className="w-full">
             <div className="flex flex-col sm:flex-row justify-between items-center w-full max-w-7xl mx-auto mb-8 gap-4">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-emerald-500/10 border border-emerald-500/20 rounded-xl">
-                  <Database className="w-6 h-6 text-emerald-400" />
+                <div className="p-2 bg-purple-500/10 border border-purple-500/20 rounded-xl">
+                  <Database className="w-6 h-6 text-purple-400" />
                 </div>
                 <h2 className="text-xl font-bold text-slate-200">Datells</h2>
               </div>
