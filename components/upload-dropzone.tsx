@@ -1,9 +1,19 @@
-"use client";
-
-import React, { useCallback, useState } from "react";
-import { motion } from "framer-motion";
-import { UploadCloud, FileType, CheckCircle, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import React, { useRef, useState } from "react";
+import { motion } from "framer-motion";
+import { IconUpload } from "@tabler/icons-react";
+import { useDropzone } from "react-dropzone";
+import { Loader2 } from "lucide-react";
+
+const mainVariant = {
+  initial: { x: 0, y: 0 },
+  animate: { x: 20, y: -20, opacity: 0.9 },
+};
+
+const secondaryVariant = {
+  initial: { opacity: 0 },
+  animate: { opacity: 1 },
+};
 
 interface UploadDropzoneProps {
   onFileUpload: (file: File) => void;
@@ -11,118 +21,184 @@ interface UploadDropzoneProps {
 }
 
 export function UploadDropzone({ onFileUpload, isLoading = false }: UploadDropzoneProps) {
-  const [isDragActive, setIsDragActive] = useState(false);
   const [file, setFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleDragEnter = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragActive(true);
-  }, []);
-
-  const handleDragLeave = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragActive(false);
-  }, []);
-
-  const handleDrop = useCallback(
-    (e: React.DragEvent) => {
-      e.preventDefault();
-      e.stopPropagation();
-      setIsDragActive(false);
-
-      if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-        const droppedFile = e.dataTransfer.files[0];
-        if (droppedFile.name.endsWith(".csv")) {
-          setFile(droppedFile);
-          onFileUpload(droppedFile);
-        } else {
-          alert("Please upload a valid CSV file.");
-        }
+  const handleFileChange = (newFiles: File[]) => {
+    if (newFiles.length > 0) {
+      const selectedFile = newFiles[0];
+      if (selectedFile.name.endsWith(".csv")) {
+        setFile(selectedFile);
+        onFileUpload(selectedFile);
+      } else {
+        alert("Please upload a valid CSV file.");
       }
-    },
-    [onFileUpload]
-  );
+    }
+  };
 
-  const handleChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      if (e.target.files && e.target.files.length > 0) {
-        const selectedFile = e.target.files[0];
-        if (selectedFile.name.endsWith(".csv")) {
-          setFile(selectedFile);
-          onFileUpload(selectedFile);
-        } else {
-          alert("Please upload a valid CSV file.");
-        }
-      }
+  const handleClick = () => {
+    if (!isLoading) {
+      fileInputRef.current?.click();
+    }
+  };
+
+  const { getRootProps, isDragActive } = useDropzone({
+    multiple: false,
+    noClick: true,
+    accept: { 'text/csv': ['.csv'] },
+    onDrop: handleFileChange,
+    onDropRejected: (error) => {
+      console.log(error);
     },
-    [onFileUpload]
-  );
+    disabled: isLoading,
+  });
 
   return (
-    <div className="w-full max-w-2xl mx-auto mt-10">
+    <div className="w-full max-w-2xl mx-auto mt-10" {...getRootProps()}>
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
+        onClick={handleClick}
+        whileHover={!isLoading ? "animate" : undefined}
         className={cn(
-          "relative group cursor-pointer overflow-hidden rounded-2xl border-2 border-dashed transition-all duration-300",
-          isDragActive
-            ? "border-emerald-500 bg-emerald-500/10"
-            : "border-slate-700 bg-slate-900/50 hover:bg-slate-800 hover:border-slate-600"
+          "p-10 group/file block rounded-2xl cursor-pointer w-full relative overflow-hidden border border-slate-800 transition-colors",
+          isDragActive ? "bg-slate-900/80 border-emerald-500/50" : "bg-slate-900/40 hover:bg-slate-900/60"
         )}
-        onDragEnter={handleDragEnter}
-        onDragOver={handleDragEnter}
-        onDragLeave={handleDragLeave}
-        onDrop={handleDrop}
       >
-        {/* Glow effect on hover */}
-        <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/0 via-emerald-500/10 to-emerald-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 blur-xl pointer-events-none" />
-
-        <label
-          htmlFor="dropzone-file"
-          className="flex flex-col items-center justify-center w-full h-64 cursor-pointer"
-        >
-          <div className="flex flex-col items-center justify-center pt-5 pb-6 z-10">
-            {isLoading ? (
-              <Loader2 className="w-12 h-12 mb-4 text-emerald-500 animate-spin" />
-            ) : file ? (
-              <CheckCircle className="w-12 h-12 mb-4 text-emerald-500" />
-            ) : (
-              <UploadCloud
+        <input
+          ref={fileInputRef}
+          id="file-upload-handle"
+          type="file"
+          accept=".csv"
+          onChange={(e) => handleFileChange(Array.from(e.target.files || []))}
+          className="hidden"
+          disabled={isLoading}
+        />
+        <div className="absolute inset-0 [mask-image:radial-gradient(ellipse_at_center,white,transparent)] pointer-events-none">
+          <GridPattern />
+        </div>
+        <div className="flex flex-col items-center justify-center relative z-10">
+          <p className="font-sans font-bold text-slate-100 text-xl tracking-tight">
+            {isLoading ? "Analyzing Dataset" : "Upload Dataset"}
+          </p>
+          <p className="font-sans font-normal text-slate-400 text-sm mt-2 max-w-sm text-center">
+            {isLoading 
+              ? "Processing your CSV locally using DuckDB-Wasm..." 
+              : "Drag or drop your CSV file here or click to upload. Files are processed securely in your browser."}
+          </p>
+          
+          <div className="relative w-full mt-10 max-w-xl mx-auto">
+            {file && (
+              <motion.div
+                key="file-upload"
+                layoutId="file-upload"
                 className={cn(
-                  "w-12 h-12 mb-4 transition-colors duration-300",
-                  isDragActive ? "text-emerald-500" : "text-slate-400 group-hover:text-emerald-400"
+                  "relative overflow-hidden z-40 bg-slate-900/80 backdrop-blur-md flex flex-col items-start justify-start p-4 mt-4 w-full mx-auto rounded-xl border border-emerald-500/30",
+                  "shadow-[0px_0px_30px_rgba(16,185,129,0.1)]"
                 )}
-              />
+              >
+                <div className="flex justify-between w-full items-center gap-4">
+                  <motion.p
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    layout
+                    className="text-base text-slate-200 truncate max-w-[200px] md:max-w-xs font-medium"
+                  >
+                    {file.name}
+                  </motion.p>
+                  <motion.p
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    layout
+                    className="rounded-md px-2 py-1 w-fit flex-shrink-0 text-xs font-semibold bg-slate-800 text-slate-300 shadow-inner"
+                  >
+                    {(file.size / (1024 * 1024)).toFixed(2)} MB
+                  </motion.p>
+                </div>
+
+                <div className="flex text-xs md:flex-row flex-col items-start md:items-center w-full mt-4 justify-between text-slate-400">
+                  <motion.p
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    layout
+                    className="px-2 py-1 rounded-md bg-slate-800 border border-slate-700/50 uppercase tracking-wider"
+                  >
+                    CSV
+                  </motion.p>
+
+                  <motion.p
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    layout
+                  >
+                    Modified {new Date(file.lastModified).toLocaleDateString()}
+                  </motion.p>
+                </div>
+              </motion.div>
             )}
 
-            <p className="mb-2 text-lg text-slate-300 font-semibold text-center px-4">
-              {isLoading ? (
-                "Processing dataset locally via DuckDB-Wasm..."
-              ) : file ? (
-                <span className="text-emerald-400">File attached: {file.name}</span>
-              ) : (
-                <>
-                  <span className="text-emerald-400 font-bold">Click to upload</span> or drag and drop
-                </>
-              )}
-            </p>
-            <p className="text-sm text-slate-500 flex items-center gap-2">
-              <FileType className="w-4 h-4" /> CSV files only (Locally Processed)
-            </p>
+            {!file && (
+              <motion.div
+                layoutId="file-upload"
+                variants={mainVariant}
+                transition={{
+                  type: "spring",
+                  stiffness: 300,
+                  damping: 20,
+                }}
+                className={cn(
+                  "relative group-hover/file:shadow-2xl z-40 bg-slate-800 flex items-center justify-center h-32 mt-4 w-full max-w-[8rem] mx-auto rounded-xl border border-slate-700",
+                  "shadow-[0px_10px_50px_rgba(0,0,0,0.3)] transition-shadow"
+                )}
+              >
+                {isLoading ? (
+                  <Loader2 className="h-6 w-6 text-emerald-400 animate-spin" />
+                ) : isDragActive ? (
+                  <motion.p
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="text-emerald-400 flex flex-col items-center gap-2 font-medium"
+                  >
+                    Drop it
+                    <IconUpload className="h-6 w-6 text-emerald-400" />
+                  </motion.p>
+                ) : (
+                  <IconUpload className="h-6 w-6 text-slate-400 group-hover/file:text-emerald-400 transition-colors" />
+                )}
+              </motion.div>
+            )}
+
+            {!file && !isLoading && (
+              <motion.div
+                variants={secondaryVariant}
+                className="absolute opacity-0 border border-dashed border-emerald-500/50 inset-0 z-30 bg-transparent flex items-center justify-center h-32 mt-4 w-full max-w-[8rem] mx-auto rounded-xl"
+              />
+            )}
           </div>
-          <input
-            id="dropzone-file"
-            type="file"
-            accept=".csv"
-            className="hidden"
-            onChange={handleChange}
-            disabled={isLoading}
-          />
-        </label>
+        </div>
       </motion.div>
+    </div>
+  );
+}
+
+export function GridPattern() {
+  const columns = 41;
+  const rows = 11;
+  return (
+    <div className="flex bg-slate-950 flex-shrink-0 flex-wrap justify-center items-center gap-x-px gap-y-px scale-105 opacity-20">
+      {Array.from({ length: rows }).map((_, row) =>
+        Array.from({ length: columns }).map((_, col) => {
+          const index = row * columns + col;
+          return (
+            <div
+              key={`${col}-${row}`}
+              className={`w-10 h-10 flex flex-shrink-0 rounded-[2px] ${
+                index % 2 === 0
+                  ? "bg-slate-900"
+                  : "bg-slate-900 shadow-[0px_0px_1px_3px_rgba(0,0,0,0.5)_inset]"
+              }`}
+            />
+          );
+        })
+      )}
     </div>
   );
 }
