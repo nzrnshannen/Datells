@@ -7,7 +7,7 @@ import { Loader2 } from "lucide-react";
 
 const mainVariant = {
   initial: { x: 0, y: 0 },
-  animate: { x: 20, y: -20, opacity: 0.9 },
+  animate: { x: 0, y: -20, opacity: 0.9 },
 };
 
 const secondaryVariant = {
@@ -60,7 +60,7 @@ export function UploadDropzone({ onFileUpload, isLoading = false }: UploadDropzo
         whileHover={!isLoading ? "animate" : undefined}
         className={cn(
           "p-10 group/file block rounded-2xl cursor-pointer w-full relative overflow-hidden border border-slate-800 transition-colors",
-          isDragActive ? "bg-slate-900/80 border-emerald-500/50" : "bg-slate-900/40 hover:bg-slate-900/60"
+          isDragActive ? "bg-slate-900/80 border-purple-500/50" : "bg-slate-900/40 hover:bg-slate-900/60"
         )}
       >
         <input
@@ -91,8 +91,8 @@ export function UploadDropzone({ onFileUpload, isLoading = false }: UploadDropzo
                 key="file-upload"
                 layoutId="file-upload"
                 className={cn(
-                  "relative overflow-hidden z-40 bg-slate-900/80 backdrop-blur-md flex flex-col items-start justify-start p-4 mt-4 w-full mx-auto rounded-xl border border-emerald-500/30",
-                  "shadow-[0px_0px_30px_rgba(16,185,129,0.1)]"
+                  "relative overflow-hidden z-40 bg-slate-900/80 backdrop-blur-md flex flex-col items-start justify-start p-4 mt-4 w-full mx-auto rounded-xl border border-purple-500/30",
+                  "shadow-[0px_0px_30px_rgba(168,85,247,0.1)]"
                 )}
               >
                 <div className="flex justify-between w-full items-center gap-4">
@@ -150,18 +150,18 @@ export function UploadDropzone({ onFileUpload, isLoading = false }: UploadDropzo
                 )}
               >
                 {isLoading ? (
-                  <Loader2 className="h-6 w-6 text-emerald-400 animate-spin" />
+                  <Loader2 className="h-6 w-6 text-purple-400 animate-spin" />
                 ) : isDragActive ? (
                   <motion.p
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    className="text-emerald-400 flex flex-col items-center gap-2 font-medium"
+                    className="text-purple-400 flex flex-col items-center gap-2 font-medium"
                   >
                     Drop it
-                    <IconUpload className="h-6 w-6 text-emerald-400" />
+                    <IconUpload className="h-6 w-6 text-purple-400" />
                   </motion.p>
                 ) : (
-                  <IconUpload className="h-6 w-6 text-slate-400 group-hover/file:text-emerald-400 transition-colors" />
+                  <IconUpload className="h-6 w-6 text-slate-400 group-hover/file:text-purple-400 transition-colors" />
                 )}
               </motion.div>
             )}
@@ -169,7 +169,7 @@ export function UploadDropzone({ onFileUpload, isLoading = false }: UploadDropzo
             {!file && !isLoading && (
               <motion.div
                 variants={secondaryVariant}
-                className="absolute opacity-0 border border-dashed border-emerald-500/50 inset-0 z-30 bg-transparent flex items-center justify-center h-32 mt-4 w-full max-w-[8rem] mx-auto rounded-xl"
+                className="absolute opacity-0 border border-dashed border-purple-500/50 inset-0 z-30 bg-transparent flex items-center justify-center h-32 mt-4 w-full max-w-[8rem] mx-auto rounded-xl"
               />
             )}
           </div>
