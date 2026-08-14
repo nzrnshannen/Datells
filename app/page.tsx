@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { motion } from "framer-motion";
 import { UploadDropzone } from "@/components/upload-dropzone";
 import { DashboardStory } from "@/components/dashboard-story";
 import { profileDataset } from "@/lib/profiler";
@@ -50,24 +51,31 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-slate-950 text-slate-200 selection:bg-emerald-500/30 overflow-x-hidden">
-      {/* Background Grid Pattern */}
-      <div className="fixed inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none" />
-      
-      {/* Radial fade for the grid */}
-      <div className="fixed left-0 right-0 top-0 -z-10 m-auto h-[400px] w-[400px] rounded-full bg-emerald-500 opacity-20 blur-[120px] pointer-events-none" />
+    <main className="min-h-screen bg-slate-950 text-slate-200 selection:bg-purple-500/30 overflow-x-hidden relative">
+      <div className="fixed inset-0 z-0 pointer-events-none">
+        {/* Ambient Glow */}
+        <div 
+          className="absolute inset-0"
+          style={{
+            background: "radial-gradient(circle at 50% 40%, rgba(147, 51, 234, 0.18) 0%, rgba(99, 102, 241, 0.08) 40%, transparent 70%)"
+          }}
+        />
+
+        {/* Sonar Rings */}
+        <AnimatedSonar />
+      </div>
 
       <div className="relative z-10 container mx-auto px-4 py-8 md:py-16 flex flex-col items-center">
         {!story ? (
           <div className="w-full max-w-4xl mx-auto flex flex-col items-center mt-12 md:mt-24">
-            <div className="inline-flex items-center justify-center p-4 bg-slate-900 border border-slate-800 rounded-2xl mb-8 shadow-2xl relative">
-              <div className="absolute inset-0 bg-emerald-500/20 blur-xl rounded-full" />
-              <Database className="w-10 h-10 text-emerald-400 relative z-10" />
-            </div>
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-center mb-6 bg-clip-text text-transparent bg-gradient-to-br from-slate-100 to-slate-500">
+            <Sparkles 
+              className="w-12 h-12 text-purple-400 mb-6 drop-shadow-[0_0_8px_rgba(168,85,247,0.4)]"
+              strokeWidth={1.5}
+            />
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-sans font-bold tracking-tight text-center mb-6 text-white">
               Datells
             </h1>
-            <p className="text-lg md:text-xl text-slate-400 text-center max-w-2xl mb-12 leading-relaxed">
+            <p className="font-sans text-base md:text-lg text-slate-300 text-center max-w-2xl mb-12 leading-relaxed">
               Drop any CSV to instantly generate a comprehensive, AI-powered interactive data story dashboard. Processed securely in your browser.
             </p>
 
@@ -83,8 +91,8 @@ export default function Home() {
           <div className="w-full">
             <div className="flex flex-col sm:flex-row justify-between items-center w-full max-w-7xl mx-auto mb-8 gap-4">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-emerald-500/10 border border-emerald-500/20 rounded-xl">
-                  <Database className="w-6 h-6 text-emerald-400" />
+                <div className="p-2 bg-purple-500/10 border border-purple-500/20 rounded-xl">
+                  <Database className="w-6 h-6 text-purple-400" />
                 </div>
                 <h2 className="text-xl font-bold text-slate-200">Datells</h2>
               </div>
@@ -100,5 +108,34 @@ export default function Home() {
         )}
       </div>
     </main>
+  );
+}
+
+function AnimatedSonar() {
+  return (
+    <div className="absolute top-[40%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[1200px] aspect-square flex items-center justify-center pointer-events-none [mask-image:radial-gradient(circle_at_center,black_20%,transparent_70%)]">
+      {[0, 1, 2, 3].map((i) => (
+        <motion.div
+          key={i}
+          className="absolute rounded-full border border-purple-500/20"
+          style={{
+            boxShadow: '0 0 20px rgba(168, 85, 247, 0.1)',
+            width: '100%',
+            height: '100%',
+          }}
+          initial={{ opacity: 0, scale: 0.1 }}
+          animate={{
+            opacity: [0, 0.4, 0],
+            scale: [0.1, 1],
+          }}
+          transition={{
+            duration: 8,
+            repeat: Infinity,
+            ease: "linear",
+            delay: i * 2,
+          }}
+        />
+      ))}
+    </div>
   );
 }
