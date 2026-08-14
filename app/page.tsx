@@ -60,16 +60,7 @@ export default function Home() {
             background: "radial-gradient(circle at 50% 40%, rgba(147, 51, 234, 0.18) 0%, rgba(99, 102, 241, 0.08) 40%, transparent 70%)"
           }}
         />
-        {/* Subtle Dot Matrix Grid */}
-        <div 
-          className="absolute inset-0"
-          style={{
-            backgroundImage: "radial-gradient(rgba(255, 255, 255, 0.25) 1px, transparent 1px)",
-            backgroundSize: "32px 32px",
-            maskImage: "radial-gradient(circle at 50% 40%, black 20%, transparent 80%)",
-            WebkitMaskImage: "radial-gradient(circle at 50% 40%, black 20%, transparent 80%)"
-          }}
-        />
+
         {/* Sonar Rings */}
         <AnimatedSonar />
       </div>
