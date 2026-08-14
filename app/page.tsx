@@ -1,12 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import { motion } from "framer-motion";
 import { UploadDropzone } from "@/components/upload-dropzone";
 import { DashboardStory } from "@/components/dashboard-story";
 import { profileDataset } from "@/lib/profiler";
 import { StoryData } from "@/lib/schema";
 import { Database, Sparkles } from "lucide-react";
-import MagicRings from "@/components/MagicRings";
 
 export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
@@ -52,30 +52,26 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-slate-950 text-slate-200 selection:bg-purple-500/30 overflow-x-hidden relative">
-      <div className="fixed inset-0 z-0 pointer-events-none [mask-image:linear-gradient(to_bottom,white_40%,transparent_80%)]">
-        <MagicRings
-          color="#A855F7"
-          colorTwo="#6366F1"
-          ringCount={6}
-          speed={1}
-          attenuation={10}
-          lineThickness={2}
-          baseRadius={0.35}
-          radiusStep={0.1}
-          scaleRate={0.1}
-          opacity={1}
-          blur={0}
-          noiseAmount={0.1}
-          rotation={0}
-          ringGap={1.5}
-          fadeIn={0.7}
-          fadeOut={0.5}
-          followMouse={false}
-          mouseInfluence={0.2}
-          hoverScale={1.2}
-          parallax={0.05}
-          clickBurst={false}
+      <div className="fixed inset-0 z-0 pointer-events-none">
+        {/* Ambient Glow */}
+        <div 
+          className="absolute inset-0"
+          style={{
+            background: "radial-gradient(circle at 50% 40%, rgba(147, 51, 234, 0.18) 0%, rgba(99, 102, 241, 0.08) 40%, transparent 70%)"
+          }}
         />
+        {/* Subtle Dot Matrix Grid */}
+        <div 
+          className="absolute inset-0"
+          style={{
+            backgroundImage: "radial-gradient(rgba(255, 255, 255, 0.25) 1px, transparent 1px)",
+            backgroundSize: "32px 32px",
+            maskImage: "radial-gradient(circle at 50% 40%, black 20%, transparent 80%)",
+            WebkitMaskImage: "radial-gradient(circle at 50% 40%, black 20%, transparent 80%)"
+          }}
+        />
+        {/* Sonar Rings */}
+        <AnimatedSonar />
       </div>
 
       <div className="relative z-10 container mx-auto px-4 py-8 md:py-16 flex flex-col items-center">
@@ -121,5 +117,34 @@ export default function Home() {
         )}
       </div>
     </main>
+  );
+}
+
+function AnimatedSonar() {
+  return (
+    <div className="absolute top-[40%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[1200px] aspect-square flex items-center justify-center pointer-events-none [mask-image:radial-gradient(circle_at_center,black_20%,transparent_70%)]">
+      {[0, 1, 2, 3].map((i) => (
+        <motion.div
+          key={i}
+          className="absolute rounded-full border border-purple-500/20"
+          style={{
+            boxShadow: '0 0 20px rgba(168, 85, 247, 0.1)',
+            width: '100%',
+            height: '100%',
+          }}
+          initial={{ opacity: 0, scale: 0.1 }}
+          animate={{
+            opacity: [0, 0.4, 0],
+            scale: [0.1, 1],
+          }}
+          transition={{
+            duration: 8,
+            repeat: Infinity,
+            ease: "linear",
+            delay: i * 2,
+          }}
+        />
+      ))}
+    </div>
   );
 }
