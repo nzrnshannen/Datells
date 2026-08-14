@@ -54,13 +54,10 @@ export function UploadDropzone({ onFileUpload, isLoading = false }: UploadDropzo
   });
 
   return (
-    <div className="w-full max-w-lg mx-auto" {...getRootProps()}>
+    <div className="w-full" {...getRootProps()}>
       <motion.div
         onClick={handleClick}
-        className={cn(
-          "p-8 block rounded-2xl cursor-pointer w-full relative overflow-hidden border border-slate-800 transition-colors",
-          isDragActive ? "bg-slate-900/80 border-purple-500/50" : "bg-slate-900/40 hover:bg-slate-900/60"
-        )}
+        className="py-4 block cursor-pointer w-full relative transition-colors"
       >
         <input
           ref={fileInputRef}
@@ -71,9 +68,7 @@ export function UploadDropzone({ onFileUpload, isLoading = false }: UploadDropzo
           className="hidden"
           disabled={isLoading}
         />
-        <div className="absolute inset-0 [mask-image:radial-gradient(ellipse_at_center,white,transparent)] pointer-events-none">
-          <GridPattern />
-        </div>
+
         <div className="flex flex-col items-center justify-center relative z-10 w-full">
           <div className="relative w-full max-w-xl mx-auto mb-8">
             {file && (
@@ -140,9 +135,10 @@ export function UploadDropzone({ onFileUpload, isLoading = false }: UploadDropzo
                   }}
                   className={cn(
                     "absolute inset-0 z-40 flex items-center justify-center rounded-full",
-                    "bg-slate-900/40 backdrop-blur-sm border border-slate-800",
-                    "shadow-[0px_4px_20px_rgba(0,0,0,0.2)] transition-all",
-                    "group-hover/btn:bg-slate-900/60 group-hover/btn:border-purple-500/30"
+                    "bg-slate-900/40 backdrop-blur-sm border border-slate-700/50",
+                    "shadow-[0px_4px_20px_rgba(0,0,0,0.2)] transition-all duration-300",
+                    "group-hover/btn:bg-slate-800/80 group-hover/btn:border-purple-500/50 group-hover/btn:scale-105 group-hover/btn:shadow-[0px_0px_30px_rgba(168,85,247,0.3)]",
+                    isDragActive ? "bg-slate-800/90 border-purple-500/60 scale-110 shadow-[0px_0px_40px_rgba(168,85,247,0.5)] animate-pulse" : ""
                   )}
                 >
                   {isLoading ? (
@@ -178,26 +174,4 @@ export function UploadDropzone({ onFileUpload, isLoading = false }: UploadDropzo
   );
 }
 
-export function GridPattern() {
-  const columns = 41;
-  const rows = 11;
-  return (
-    <div className="flex bg-slate-950 flex-shrink-0 flex-wrap justify-center items-center gap-x-px gap-y-px scale-105 opacity-20">
-      {Array.from({ length: rows }).map((_, row) =>
-        Array.from({ length: columns }).map((_, col) => {
-          const index = row * columns + col;
-          return (
-            <div
-              key={`${col}-${row}`}
-              className={`w-10 h-10 flex flex-shrink-0 rounded-[2px] ${
-                index % 2 === 0
-                  ? "bg-slate-900"
-                  : "bg-slate-900 shadow-[0px_0px_1px_3px_rgba(0,0,0,0.5)_inset]"
-              }`}
-            />
-          );
-        })
-      )}
-    </div>
-  );
-}
+
