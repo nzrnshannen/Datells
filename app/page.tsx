@@ -52,7 +52,7 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-slate-950 text-slate-200 selection:bg-purple-500/30 overflow-x-hidden relative">
-      <div className="fixed inset-0 z-0 pointer-events-none">
+      <div className="fixed inset-0 z-0 pointer-events-none [mask-image:linear-gradient(to_bottom,white_40%,transparent_80%)]">
         <MagicRings
           color="#A855F7"
           colorTwo="#6366F1"

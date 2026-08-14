@@ -54,7 +54,7 @@ export function UploadDropzone({ onFileUpload, isLoading = false }: UploadDropzo
   });
 
   return (
-    <div className="w-full max-w-2xl mx-auto mt-10" {...getRootProps()}>
+    <div className="w-full max-w-2xl mx-auto" {...getRootProps()}>
       <motion.div
         onClick={handleClick}
         className={cn(
