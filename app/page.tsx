@@ -85,10 +85,10 @@ export default function Home() {
               <div className="absolute inset-0 bg-purple-500/20 blur-xl rounded-full" />
               <Database className="w-10 h-10 text-purple-400 relative z-10" />
             </div>
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-center mb-6 bg-clip-text text-transparent bg-gradient-to-br from-slate-100 to-slate-500">
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-sans font-bold tracking-tight text-center mb-6 text-white">
               Datells
             </h1>
-            <p className="text-lg md:text-xl text-slate-400 text-center max-w-2xl mb-12 leading-relaxed">
+            <p className="font-sans text-base md:text-lg text-slate-300 text-center max-w-2xl mb-12 leading-relaxed">
               Drop any CSV to instantly generate a comprehensive, AI-powered interactive data story dashboard. Processed securely in your browser.
             </p>
 

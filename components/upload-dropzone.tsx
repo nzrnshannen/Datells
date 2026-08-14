@@ -160,10 +160,10 @@ export function UploadDropzone({ onFileUpload, isLoading = false }: UploadDropzo
             )}
           </div>
 
-          <p className="font-sans font-bold text-slate-100 text-xl tracking-tight">
+          <p className="font-sans font-semibold text-white text-xl tracking-tight">
             {isLoading ? "Analyzing Dataset" : "Upload Dataset"}
           </p>
-          <p className="font-sans font-normal text-slate-400 text-sm mt-2 max-w-sm text-center">
+          <p className="font-sans text-xs text-slate-400 mt-2 max-w-sm text-center">
             {isLoading 
               ? "Processing your CSV locally using DuckDB-Wasm..." 
               : "Drag or drop your CSV file here or click to upload. Files are processed securely in your browser."}
