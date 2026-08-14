@@ -128,7 +128,7 @@ export function UploadDropzone({ onFileUpload, isLoading = false }: UploadDropzo
             {!file && (
               <motion.div
                 whileHover={!isLoading ? "animate" : undefined}
-                className="group/btn relative w-full max-w-[8rem] mx-auto h-32"
+                className="group/btn relative mx-auto h-24 w-24"
               >
                 <motion.div
                   layoutId="file-upload"
@@ -139,30 +139,25 @@ export function UploadDropzone({ onFileUpload, isLoading = false }: UploadDropzo
                     damping: 20,
                   }}
                   className={cn(
-                    "absolute inset-0 group-hover/btn:shadow-2xl z-40 bg-slate-800 flex items-center justify-center w-full rounded-xl border border-slate-700",
-                    "shadow-[0px_10px_50px_rgba(0,0,0,0.3)] transition-shadow"
+                    "absolute inset-0 z-40 flex items-center justify-center rounded-full",
+                    "bg-slate-900/40 backdrop-blur-sm border border-slate-800",
+                    "shadow-[0px_4px_20px_rgba(0,0,0,0.2)] transition-all",
+                    "group-hover/btn:bg-slate-900/60 group-hover/btn:border-purple-500/30"
                   )}
                 >
                   {isLoading ? (
-                    <Loader2 className="h-6 w-6 text-purple-400 animate-spin" />
+                    <Loader2 className="h-8 w-8 text-purple-400 animate-spin" />
                   ) : isDragActive ? (
-                    <motion.p
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      className="text-purple-400 flex flex-col items-center gap-2 font-medium"
-                    >
-                      Drop it
-                      <IconUpload className="h-6 w-6 text-purple-400" />
-                    </motion.p>
+                    <IconUpload className="h-8 w-8 text-purple-400" />
                   ) : (
-                    <IconUpload className="h-6 w-6 text-slate-400 group-hover/btn:text-purple-400 transition-colors" />
+                    <IconUpload className="h-8 w-8 text-slate-400 group-hover/btn:text-purple-400 transition-colors" />
                   )}
                 </motion.div>
 
                 {!isLoading && (
                   <motion.div
                     variants={secondaryVariant}
-                    className="absolute opacity-0 border border-dashed border-purple-500/50 inset-0 z-30 bg-transparent flex items-center justify-center w-full rounded-xl"
+                    className="absolute opacity-0 border border-dashed border-purple-500/50 inset-0 z-30 bg-transparent rounded-full"
                   />
                 )}
               </motion.div>
