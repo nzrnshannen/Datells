@@ -57,9 +57,8 @@ export function UploadDropzone({ onFileUpload, isLoading = false }: UploadDropzo
     <div className="w-full max-w-2xl mx-auto mt-10" {...getRootProps()}>
       <motion.div
         onClick={handleClick}
-        whileHover={!isLoading ? "animate" : undefined}
         className={cn(
-          "p-10 group/file block rounded-2xl cursor-pointer w-full relative overflow-hidden border border-slate-800 transition-colors",
+          "p-10 block rounded-2xl cursor-pointer w-full relative overflow-hidden border border-slate-800 transition-colors",
           isDragActive ? "bg-slate-900/80 border-purple-500/50" : "bg-slate-900/40 hover:bg-slate-900/60"
         )}
       >
@@ -137,40 +136,45 @@ export function UploadDropzone({ onFileUpload, isLoading = false }: UploadDropzo
 
             {!file && (
               <motion.div
-                layoutId="file-upload"
-                variants={mainVariant}
-                transition={{
-                  type: "spring",
-                  stiffness: 300,
-                  damping: 20,
-                }}
-                className={cn(
-                  "relative group-hover/file:shadow-2xl z-40 bg-slate-800 flex items-center justify-center h-32 mt-4 w-full max-w-[8rem] mx-auto rounded-xl border border-slate-700",
-                  "shadow-[0px_10px_50px_rgba(0,0,0,0.3)] transition-shadow"
-                )}
+                whileHover={!isLoading ? "animate" : undefined}
+                className="group/btn relative w-full max-w-[8rem] mx-auto mt-4 h-32"
               >
-                {isLoading ? (
-                  <Loader2 className="h-6 w-6 text-purple-400 animate-spin" />
-                ) : isDragActive ? (
-                  <motion.p
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="text-purple-400 flex flex-col items-center gap-2 font-medium"
-                  >
-                    Drop it
-                    <IconUpload className="h-6 w-6 text-purple-400" />
-                  </motion.p>
-                ) : (
-                  <IconUpload className="h-6 w-6 text-slate-400 group-hover/file:text-purple-400 transition-colors" />
+                <motion.div
+                  layoutId="file-upload"
+                  variants={mainVariant}
+                  transition={{
+                    type: "spring",
+                    stiffness: 300,
+                    damping: 20,
+                  }}
+                  className={cn(
+                    "absolute inset-0 group-hover/btn:shadow-2xl z-40 bg-slate-800 flex items-center justify-center w-full rounded-xl border border-slate-700",
+                    "shadow-[0px_10px_50px_rgba(0,0,0,0.3)] transition-shadow"
+                  )}
+                >
+                  {isLoading ? (
+                    <Loader2 className="h-6 w-6 text-purple-400 animate-spin" />
+                  ) : isDragActive ? (
+                    <motion.p
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="text-purple-400 flex flex-col items-center gap-2 font-medium"
+                    >
+                      Drop it
+                      <IconUpload className="h-6 w-6 text-purple-400" />
+                    </motion.p>
+                  ) : (
+                    <IconUpload className="h-6 w-6 text-slate-400 group-hover/btn:text-purple-400 transition-colors" />
+                  )}
+                </motion.div>
+
+                {!isLoading && (
+                  <motion.div
+                    variants={secondaryVariant}
+                    className="absolute opacity-0 border border-dashed border-purple-500/50 inset-0 z-30 bg-transparent flex items-center justify-center w-full rounded-xl"
+                  />
                 )}
               </motion.div>
-            )}
-
-            {!file && !isLoading && (
-              <motion.div
-                variants={secondaryVariant}
-                className="absolute opacity-0 border border-dashed border-purple-500/50 inset-0 z-30 bg-transparent flex items-center justify-center h-32 mt-4 w-full max-w-[8rem] mx-auto rounded-xl"
-              />
             )}
           </div>
         </div>
