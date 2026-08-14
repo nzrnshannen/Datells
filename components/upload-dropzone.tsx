@@ -56,8 +56,7 @@ export function UploadDropzone({ onFileUpload, isLoading = false }: UploadDropzo
   return (
     <div className="w-full" {...getRootProps()}>
       <motion.div
-        onClick={handleClick}
-        className="py-4 block cursor-pointer w-full relative transition-colors"
+        className="py-4 block w-full relative transition-colors"
       >
         <input
           ref={fileInputRef}
@@ -123,7 +122,8 @@ export function UploadDropzone({ onFileUpload, isLoading = false }: UploadDropzo
             {!file && (
               <motion.div
                 whileHover={!isLoading ? "animate" : undefined}
-                className="group/btn relative mx-auto h-24 w-24"
+                className="group/btn relative mx-auto h-24 w-24 cursor-pointer"
+                onClick={handleClick}
               >
                 <motion.div
                   layoutId="file-upload"
@@ -160,14 +160,16 @@ export function UploadDropzone({ onFileUpload, isLoading = false }: UploadDropzo
             )}
           </div>
 
-          <p className="font-sans font-semibold text-white text-xl tracking-tight">
-            {isLoading ? "Analyzing Dataset" : "Upload Dataset"}
-          </p>
-          <p className="font-sans text-xs text-slate-400 mt-2 max-w-sm text-center">
-            {isLoading 
-              ? "Processing your CSV locally using DuckDB-Wasm..." 
-              : "Drag or drop your CSV file here or click to upload. Files are processed securely in your browser."}
-          </p>
+          <div className="flex flex-col items-center cursor-pointer" onClick={handleClick}>
+            <p className="font-sans font-semibold text-white text-xl tracking-tight hover:text-purple-400 transition-colors">
+              {isLoading ? "Analyzing Dataset" : "Upload Dataset"}
+            </p>
+            <p className="font-sans text-xs text-slate-400 mt-2 max-w-sm text-center">
+              {isLoading 
+                ? "Processing your CSV locally using DuckDB-Wasm..." 
+                : "Drag or drop your CSV file here or click to upload. Files are processed securely in your browser."}
+            </p>
+          </div>
         </div>
       </motion.div>
     </div>
