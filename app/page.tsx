@@ -68,10 +68,10 @@ export default function Home() {
       <div className="relative z-10 container mx-auto px-4 py-8 md:py-16 flex flex-col items-center">
         {!story ? (
           <div className="w-full max-w-4xl mx-auto flex flex-col items-center mt-12 md:mt-24">
-            <div className="inline-flex items-center justify-center p-4 bg-slate-900 border border-slate-800 rounded-2xl mb-8 shadow-2xl relative">
-              <div className="absolute inset-0 bg-purple-500/20 blur-xl rounded-full" />
-              <Database className="w-10 h-10 text-purple-400 relative z-10" />
-            </div>
+            <Sparkles 
+              className="w-12 h-12 text-purple-400 mb-6 drop-shadow-[0_0_8px_rgba(168,85,247,0.4)]"
+              strokeWidth={1.5}
+            />
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-sans font-bold tracking-tight text-center mb-6 text-white">
               Datells
             </h1>
