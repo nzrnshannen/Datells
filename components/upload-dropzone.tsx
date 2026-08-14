@@ -54,11 +54,11 @@ export function UploadDropzone({ onFileUpload, isLoading = false }: UploadDropzo
   });
 
   return (
-    <div className="w-full max-w-2xl mx-auto" {...getRootProps()}>
+    <div className="w-full max-w-lg mx-auto" {...getRootProps()}>
       <motion.div
         onClick={handleClick}
         className={cn(
-          "p-10 block rounded-2xl cursor-pointer w-full relative overflow-hidden border border-slate-800 transition-colors",
+          "p-8 block rounded-2xl cursor-pointer w-full relative overflow-hidden border border-slate-800 transition-colors",
           isDragActive ? "bg-slate-900/80 border-purple-500/50" : "bg-slate-900/40 hover:bg-slate-900/60"
         )}
       >
