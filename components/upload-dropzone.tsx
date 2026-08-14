@@ -74,23 +74,14 @@ export function UploadDropzone({ onFileUpload, isLoading = false }: UploadDropzo
         <div className="absolute inset-0 [mask-image:radial-gradient(ellipse_at_center,white,transparent)] pointer-events-none">
           <GridPattern />
         </div>
-        <div className="flex flex-col items-center justify-center relative z-10">
-          <p className="font-sans font-bold text-slate-100 text-xl tracking-tight">
-            {isLoading ? "Analyzing Dataset" : "Upload Dataset"}
-          </p>
-          <p className="font-sans font-normal text-slate-400 text-sm mt-2 max-w-sm text-center">
-            {isLoading 
-              ? "Processing your CSV locally using DuckDB-Wasm..." 
-              : "Drag or drop your CSV file here or click to upload. Files are processed securely in your browser."}
-          </p>
-          
-          <div className="relative w-full mt-10 max-w-xl mx-auto">
+        <div className="flex flex-col items-center justify-center relative z-10 w-full">
+          <div className="relative w-full max-w-xl mx-auto mb-8">
             {file && (
               <motion.div
                 key="file-upload"
                 layoutId="file-upload"
                 className={cn(
-                  "relative overflow-hidden z-40 bg-slate-900/80 backdrop-blur-md flex flex-col items-start justify-start p-4 mt-4 w-full mx-auto rounded-xl border border-purple-500/30",
+                  "relative overflow-hidden z-40 bg-slate-900/80 backdrop-blur-md flex flex-col items-start justify-start p-4 w-full mx-auto rounded-xl border border-purple-500/30",
                   "shadow-[0px_0px_30px_rgba(168,85,247,0.1)]"
                 )}
               >
@@ -137,7 +128,7 @@ export function UploadDropzone({ onFileUpload, isLoading = false }: UploadDropzo
             {!file && (
               <motion.div
                 whileHover={!isLoading ? "animate" : undefined}
-                className="group/btn relative w-full max-w-[8rem] mx-auto mt-4 h-32"
+                className="group/btn relative w-full max-w-[8rem] mx-auto h-32"
               >
                 <motion.div
                   layoutId="file-upload"
@@ -177,6 +168,15 @@ export function UploadDropzone({ onFileUpload, isLoading = false }: UploadDropzo
               </motion.div>
             )}
           </div>
+
+          <p className="font-sans font-bold text-slate-100 text-xl tracking-tight">
+            {isLoading ? "Analyzing Dataset" : "Upload Dataset"}
+          </p>
+          <p className="font-sans font-normal text-slate-400 text-sm mt-2 max-w-sm text-center">
+            {isLoading 
+              ? "Processing your CSV locally using DuckDB-Wasm..." 
+              : "Drag or drop your CSV file here or click to upload. Files are processed securely in your browser."}
+          </p>
         </div>
       </motion.div>
     </div>
