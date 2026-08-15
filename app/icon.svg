@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="128" fill="#0f0914" />
+  <circle cx="256" cy="256" r="256" fill="url(#glow)" opacity="0.3" />
+  <!-- Sparkles -->
+  <path d="M420 120 Q 420 92 448 92 Q 420 92 420 64 Q 420 92 392 92 Q 420 92 420 120" fill="#d8b4fe" />
+  <path d="M110 390 Q 110 376 124 376 Q 110 376 110 362 Q 110 376 96 376 Q 110 376 110 390" fill="#a855f7" />
+  <!-- Stylized D -->
+  <path d="M176 144 H 280 C 341.86 144 392 194.14 392 256 C 392 317.86 341.86 368 280 368 H 176 V 144 Z" fill="url(#grad)" />
+  <path d="M224 208 V 304 H 272 C 298.51 304 320 282.51 320 256 C 320 229.49 298.51 208 272 208 H 224 Z" fill="#0f0914" />
+  <!-- Data nodes/dots -->
+  <circle cx="176" cy="144" r="16" fill="#f3e8ff" />
+  <circle cx="176" cy="368" r="16" fill="#f3e8ff" />
+  <circle cx="392" cy="256" r="16" fill="#f3e8ff" />
+  <defs>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#9333ea" />
+      <stop offset="100%" stop-color="#3b0764" stop-opacity="0" />
+    </radialGradient>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#d8b4fe" />
+      <stop offset="50%" stop-color="#a855f7" />
+      <stop offset="100%" stop-color="#6b21a8" />
+    </linearGradient>
+  </defs>
+</svg>
