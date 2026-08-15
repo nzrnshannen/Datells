@@ -15,7 +15,7 @@ export async function POST(req: Request) {
     }
 
     const { object } = await generateObject({
-      model: google('gemini-1.5-flash'),
+      model: google('gemini-3.5-flash'),
       schema: storySchema,
       system: `You are an expert Data Scientist and Executive Storyteller. You analyze dataset summary statistics and generate a cohesive, interactive data story for a dashboard.`,
       prompt: `
