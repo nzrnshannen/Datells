@@ -7,7 +7,7 @@ import { DashboardStory } from "@/components/dashboard-story";
 import { profileDataset } from "@/lib/profiler";
 import { StoryData } from "@/lib/schema";
 import { Database, Sparkles, Download, Save, Clock, CheckCircle2, AlertTriangle } from "lucide-react";
-import html2canvas from "html2canvas";
+import { toPng } from 'html-to-image';
 import jsPDF from "jspdf";
 
 export default function Home() {
@@ -55,20 +55,22 @@ export default function Home() {
     setIsExporting(true);
     
     try {
-      const canvas = await html2canvas(reportRef.current, {
-        scale: 2,
-        useCORS: true,
+      const node = reportRef.current;
+      const dataUrl = await toPng(node, {
+        pixelRatio: 2,
         backgroundColor: '#020617', // match slate-950
       });
       
-      const imgData = canvas.toDataURL("image/png");
+      const width = node.offsetWidth * 2;
+      const height = node.offsetHeight * 2;
+
       const pdf = new jsPDF({
         orientation: "portrait",
         unit: "px",
-        format: [canvas.width, canvas.height]
+        format: [width, height]
       });
       
-      pdf.addImage(imgData, "PNG", 0, 0, canvas.width, canvas.height);
+      pdf.addImage(dataUrl, "PNG", 0, 0, width, height);
       pdf.save("datells-report.pdf");
       showToast("PDF Exported successfully!");
     } catch (err: unknown) {
