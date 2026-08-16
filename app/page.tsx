@@ -23,6 +23,7 @@ export default function Home() {
   useEffect(() => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("datells_saved_report");
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       if (saved) setHasSavedReport(true);
     }
   }, []);
@@ -69,7 +70,7 @@ export default function Home() {
       pdf.addImage(imgData, "PNG", 0, 0, canvas.width, canvas.height);
       pdf.save("datells-report.pdf");
       showToast("PDF Exported successfully!");
-    } catch (err) {
+    } catch (err: unknown) {
       console.error(err);
       setError("Failed to export PDF");
     } finally {
