@@ -1,17 +1,81 @@
 "use client";
 
-import { useState } from "react";
-import { motion } from "framer-motion";
+import { useState, useRef, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { UploadDropzone } from "@/components/upload-dropzone";
 import { DashboardStory } from "@/components/dashboard-story";
 import { profileDataset } from "@/lib/profiler";
 import { StoryData } from "@/lib/schema";
-import { Database, Sparkles } from "lucide-react";
+import { Database, Sparkles, Download, Save, Clock, CheckCircle2 } from "lucide-react";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 
 export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [story, setStory] = useState<StoryData | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  const reportRef = useRef<HTMLDivElement>(null);
+  const [hasSavedReport, setHasSavedReport] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
+  const [toast, setToast] = useState<{ show: boolean; message: string }>({ show: false, message: "" });
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("datells_saved_report");
+      if (saved) setHasSavedReport(true);
+    }
+  }, []);
+
+  const showToast = (message: string) => {
+    setToast({ show: true, message });
+    setTimeout(() => setToast({ show: false, message: "" }), 3000);
+  };
+
+  const saveToLocal = () => {
+    if (story) {
+      localStorage.setItem("datells_saved_report", JSON.stringify(story));
+      setHasSavedReport(true);
+      showToast("Report saved successfully!");
+    }
+  };
+
+  const loadFromLocal = () => {
+    const saved = localStorage.getItem("datells_saved_report");
+    if (saved) {
+      setStory(JSON.parse(saved));
+      showToast("Recent report loaded");
+    }
+  };
+
+  const exportToPDF = async () => {
+    if (!reportRef.current) return;
+    setIsExporting(true);
+    
+    try {
+      const canvas = await html2canvas(reportRef.current, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: '#020617', // match slate-950
+      });
+      
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "px",
+        format: [canvas.width, canvas.height]
+      });
+      
+      pdf.addImage(imgData, "PNG", 0, 0, canvas.width, canvas.height);
+      pdf.save("datells-report.pdf");
+      showToast("PDF Exported successfully!");
+    } catch (err) {
+      console.error(err);
+      setError("Failed to export PDF");
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   const handleFileUpload = async (file: File) => {
     setIsLoading(true);
@@ -81,6 +145,18 @@ export default function Home() {
 
             <UploadDropzone onFileUpload={handleFileUpload} isLoading={isLoading} />
             
+            {hasSavedReport && !isLoading && (
+              <motion.button
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                onClick={loadFromLocal}
+                className="mt-6 flex items-center gap-2 px-5 py-2.5 bg-slate-900 border border-slate-800 hover:border-purple-500/50 hover:bg-slate-800 text-slate-300 rounded-xl transition-all shadow-lg group"
+              >
+                <Clock className="w-4 h-4 text-purple-400 group-hover:-rotate-180 transition-transform duration-500" />
+                <span className="text-sm font-medium">Load Recent Report</span>
+              </motion.button>
+            )}
+
             {error && (
               <div className="mt-8 p-4 bg-rose-500/10 border border-rose-500/20 text-rose-400 rounded-xl max-w-2xl w-full text-center">
                 {error}
@@ -96,17 +172,54 @@ export default function Home() {
                 </div>
                 <h2 className="text-xl font-bold text-slate-200">Datells</h2>
               </div>
-              <button 
-                onClick={() => setStory(null)}
-                className="px-4 py-2 bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-300 text-sm font-medium rounded-lg transition-colors shadow-lg"
-              >
-                Upload New Dataset
-              </button>
+              
+              <div className="flex flex-wrap items-center justify-center sm:justify-end gap-3">
+                <button 
+                  onClick={saveToLocal}
+                  className="flex items-center gap-2 px-4 py-2 bg-slate-900 border border-purple-500/30 hover:bg-slate-800 text-slate-200 text-sm font-medium rounded-lg transition-colors shadow-lg"
+                >
+                  <Save className="w-4 h-4 text-purple-400" />
+                  Save to Local
+                </button>
+                <button 
+                  onClick={exportToPDF}
+                  disabled={isExporting}
+                  className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white text-sm font-medium rounded-lg transition-colors shadow-lg shadow-purple-500/20 disabled:opacity-50"
+                >
+                  <Download className="w-4 h-4" />
+                  {isExporting ? "Exporting..." : "Export PDF"}
+                </button>
+                <div className="w-px h-6 bg-slate-800 mx-1 hidden sm:block"></div>
+                <button 
+                  onClick={() => setStory(null)}
+                  className="px-4 py-2 bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-300 text-sm font-medium rounded-lg transition-colors shadow-lg"
+                >
+                  Upload New
+                </button>
+              </div>
             </div>
-            <DashboardStory story={story} />
+            
+            <div ref={reportRef} className="bg-slate-950 relative z-10 pb-8">
+              <DashboardStory story={story} />
+            </div>
           </div>
         )}
       </div>
+
+      {/* Toast Notification */}
+      <AnimatePresence>
+        {toast.show && (
+          <motion.div
+            initial={{ opacity: 0, y: 50, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.9 }}
+            className="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-4 py-3 bg-slate-900/90 backdrop-blur-md border border-slate-800 rounded-xl shadow-2xl"
+          >
+            <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+            <p className="text-sm font-medium text-slate-200">{toast.message}</p>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </main>
   );
 }
