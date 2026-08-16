@@ -8,6 +8,8 @@ import { Database, Sparkles, Download, Save, Clock, CheckCircle2, AlertTriangle,
 import { toPng } from 'html-to-image';
 import jsPDF from "jspdf";
 import { SavedReport, getReports, saveReport, loadReportById, deleteReport } from "@/lib/storage";
+import { profileDataset } from "@/lib/profiler";
+import { StoryData } from "@/lib/schema";
 
 export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
