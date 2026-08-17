@@ -445,7 +445,7 @@ export default function Home() {
                     type="text"
                     value={exportFileName}
                     onChange={(e) => setExportFileName(e.target.value)}
-                    className="w-full bg-slate-800/50 border border-slate-700 rounded-xl px-4 py-3 text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/50 transition-all"
+                    className="w-full bg-slate-800/50 border border-slate-700 rounded-xl pl-4 pr-12 py-3 text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/50 transition-all"
                     placeholder="Enter file name..."
                     autoFocus
                   />
