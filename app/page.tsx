@@ -23,6 +23,8 @@ export default function Home() {
   const [isExporting, setIsExporting] = useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [showHistoryModal, setShowHistoryModal] = useState(false);
+  const [showExportModal, setShowExportModal] = useState(false);
+  const [exportFileName, setExportFileName] = useState("datells-report");
   const [toast, setToast] = useState<{ show: boolean; message: string }>({ show: false, message: "" });
 
   useEffect(() => {
@@ -75,9 +77,10 @@ export default function Home() {
     showToast("Report deleted");
   };
 
-  const exportToPDF = async () => {
+  const exportToPDF = async (fileName: string) => {
     if (!reportRef.current) return;
     setIsExporting(true);
+    setShowExportModal(false);
     
     try {
       const node = reportRef.current;
@@ -96,7 +99,7 @@ export default function Home() {
       });
       
       pdf.addImage(dataUrl, "PNG", 0, 0, width, height);
-      pdf.save("datells-report.pdf");
+      pdf.save(`${fileName || "datells-report"}.pdf`);
       showToast("PDF Exported successfully!");
     } catch (err: unknown) {
       console.error(err);
@@ -219,7 +222,10 @@ export default function Home() {
                   Save to Local
                 </button>
                 <button 
-                  onClick={exportToPDF}
+                  onClick={() => {
+                    setExportFileName(story.title.toLowerCase().replace(/[^a-z0-9]+/g, '-') || "datells-report");
+                    setShowExportModal(true);
+                  }}
                   disabled={isExporting}
                   className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white text-sm font-medium rounded-lg transition-colors shadow-lg shadow-purple-500/20 disabled:opacity-50"
                 >
@@ -390,6 +396,79 @@ export default function Home() {
                     </div>
                   ))
                 )}
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Export Modal */}
+      <AnimatePresence>
+        {showExportModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowExportModal(false)}
+              className="absolute inset-0 bg-slate-950/60 backdrop-blur-sm"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="relative bg-slate-900 border border-slate-700/50 rounded-2xl shadow-2xl p-6 sm:p-8 max-w-md w-full overflow-hidden"
+            >
+              <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
+              
+              <div className="flex items-center justify-between mb-6 relative z-10">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-purple-500/10 border border-purple-500/20 rounded-xl">
+                    <Download className="w-5 h-5 text-purple-400" />
+                  </div>
+                  <h3 className="text-xl font-bold text-slate-100">Export Report</h3>
+                </div>
+                <button 
+                  onClick={() => setShowExportModal(false)}
+                  className="p-2 hover:bg-slate-800 rounded-lg text-slate-400 transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              
+              <div className="relative z-10 mb-8">
+                <label className="block text-sm font-medium text-slate-400 mb-2">
+                  File Name
+                </label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={exportFileName}
+                    onChange={(e) => setExportFileName(e.target.value)}
+                    className="w-full bg-slate-800/50 border border-slate-700 rounded-xl pl-4 pr-12 py-3 text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/50 transition-all"
+                    placeholder="Enter file name..."
+                    autoFocus
+                  />
+                  <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-slate-500 font-medium">
+                    .pdf
+                  </div>
+                </div>
+              </div>
+              
+              <div className="flex flex-col sm:flex-row justify-end gap-3 relative z-10">
+                <button
+                  onClick={() => setShowExportModal(false)}
+                  className="px-4 py-2 bg-transparent hover:bg-slate-800 text-slate-300 text-sm font-medium rounded-lg transition-colors border border-transparent hover:border-slate-700"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => exportToPDF(exportFileName)}
+                  className="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white text-sm font-medium rounded-lg transition-colors shadow-lg shadow-purple-500/20 flex items-center gap-2"
+                >
+                  <Download className="w-4 h-4" />
+                  Export Now
+                </button>
               </div>
             </motion.div>
           </div>
