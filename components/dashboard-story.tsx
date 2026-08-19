@@ -4,7 +4,7 @@ import React from 'react';
 import { StoryData } from '@/lib/schema';
 import { DynamicChart } from './dynamic-chart';
 import { motion } from 'framer-motion';
-import { AlertTriangle, TrendingUp, Sparkles, AlertCircle } from 'lucide-react';
+import { AlertTriangle, TrendingUp, TrendingDown, Sparkles, AlertCircle, Info } from 'lucide-react';
 
 interface DashboardStoryProps {
   story: StoryData;
@@ -37,30 +37,50 @@ export function DashboardStory({ story }: DashboardStoryProps) {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {/* Takeaways */}
-        <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6">
-            {story.keyTakeaways.map((takeaway, i) => (
-                <motion.div 
-                    key={i}
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: i * 0.1 }}
-                    className="bg-slate-900/40 border border-slate-800 rounded-2xl p-6 hover:bg-slate-800/80 hover:border-slate-700 transition-all group relative overflow-hidden shadow-lg"
-                >
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full blur-3xl group-hover:bg-emerald-500/10 transition-colors pointer-events-none" />
-                    <div className="flex items-start justify-between mb-4">
-                        <div className="p-2 bg-slate-800/80 border border-slate-700 rounded-lg group-hover:scale-110 transition-transform">
-                            <TrendingUp className="w-5 h-5 text-emerald-400" />
+        <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6 auto-rows-fr">
+            {story.keyTakeaways.map((takeaway, i) => {
+                let Icon = Sparkles;
+                let colorClass = "text-indigo-400";
+                let glowClass = "bg-indigo-500/5 group-hover:bg-indigo-500/10";
+                
+                // @ts-ignore - Handle older schema types or default
+                const type = takeaway.type || 'insight';
+                if (type === 'positive') {
+                    Icon = TrendingUp;
+                    colorClass = "text-emerald-400";
+                    glowClass = "bg-emerald-500/5 group-hover:bg-emerald-500/10";
+                } else if (type === 'negative') {
+                    Icon = TrendingDown;
+                    colorClass = "text-amber-400";
+                    glowClass = "bg-amber-500/5 group-hover:bg-amber-500/10";
+                } else if (type === 'neutral') {
+                    Icon = Info;
+                    colorClass = "text-blue-400";
+                    glowClass = "bg-blue-500/5 group-hover:bg-blue-500/10";
+                }
+
+                return (
+                    <motion.div 
+                        key={i}
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: i * 0.1 }}
+                        className="bg-slate-900/40 border border-slate-800 rounded-2xl p-6 hover:bg-slate-800/80 hover:border-slate-700 transition-all group relative overflow-hidden shadow-lg flex flex-col h-full"
+                    >
+                        <div className={`absolute top-0 right-0 w-32 h-32 rounded-full blur-3xl transition-colors pointer-events-none ${glowClass}`} />
+                        <div className="flex items-start justify-between mb-4">
+                            <div className="p-2 bg-slate-800/80 border border-slate-700 rounded-lg group-hover:scale-110 transition-transform">
+                                <Icon className={`w-5 h-5 ${colorClass}`} />
+                            </div>
                         </div>
-                        {takeaway.metricImpact && (
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                                {takeaway.metricImpact}
-                            </span>
-                        )}
-                    </div>
-                    <h3 className="text-lg font-semibold text-slate-200 mb-2">{takeaway.title}</h3>
-                    <p className="text-sm text-slate-400 leading-relaxed">{takeaway.detail}</p>
-                </motion.div>
-            ))}
+                        <div className="mb-4">
+                            <h3 className="text-sm font-medium text-slate-400 mb-1">{takeaway.title}</h3>
+                            <p className="text-3xl font-bold text-slate-100">{takeaway.metricImpact || "Insight"}</p>
+                        </div>
+                        <p className="text-sm text-slate-400 leading-relaxed flex-1 line-clamp-2">{takeaway.detail}</p>
+                    </motion.div>
+                );
+            })}
         </div>
 
         {/* Anomalies Panel */}
@@ -68,25 +88,30 @@ export function DashboardStory({ story }: DashboardStoryProps) {
             <motion.div 
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
-                className="bg-slate-900/40 border border-slate-800 rounded-2xl p-6 flex flex-col shadow-lg"
+                className="bg-slate-900/40 border border-slate-800 rounded-2xl p-6 flex flex-col shadow-lg h-full"
             >
                 <div className="flex items-center gap-2 mb-6">
                     <AlertTriangle className="w-5 h-5 text-amber-500" />
                     <h3 className="text-lg font-semibold text-slate-200">Detected Anomalies</h3>
                 </div>
                 <div className="space-y-4 flex-1 overflow-y-auto pr-2 custom-scrollbar">
-                    {story.anomaliesDetected.map((anomaly, i) => (
-                        <div key={i} className="flex gap-3 items-start bg-slate-950/50 p-4 rounded-xl border border-slate-800/50 hover:border-slate-700 transition-colors">
-                            <AlertCircle className={`w-4 h-4 mt-0.5 shrink-0 ${
-                                anomaly.severity === 'high' ? 'text-rose-500' :
-                                anomaly.severity === 'medium' ? 'text-amber-500' : 'text-blue-400'
-                            }`} />
-                            <div>
-                                <p className="text-sm font-medium text-slate-300 mb-1">{anomaly.column}</p>
-                                <p className="text-xs text-slate-500 leading-relaxed">{anomaly.observation}</p>
+                    {story.anomaliesDetected.map((anomaly, i) => {
+                        const isHigh = anomaly.severity === 'high';
+                        const isMed = anomaly.severity === 'medium';
+                        const borderColor = isHigh ? 'border-rose-500/60' : isMed ? 'border-amber-500/60' : 'border-blue-500/60';
+                        const iconColor = isHigh ? 'text-rose-500' : isMed ? 'text-amber-500' : 'text-blue-400';
+                        const bgHover = isHigh ? 'hover:bg-rose-950/20' : isMed ? 'hover:bg-amber-950/20' : 'hover:bg-blue-950/20';
+                        
+                        return (
+                            <div key={i} className={`flex gap-3 items-start pl-4 py-2 border-l-2 ${borderColor} ${bgHover} transition-colors`}>
+                                <AlertCircle className={`w-4 h-4 mt-0.5 shrink-0 ${iconColor}`} />
+                                <div>
+                                    <p className="text-sm font-medium text-slate-200 mb-1">{anomaly.column}</p>
+                                    <p className="text-sm text-slate-400 leading-relaxed">{anomaly.observation}</p>
+                                </div>
                             </div>
-                        </div>
-                    ))}
+                        );
+                    })}
                 </div>
             </motion.div>
         )}

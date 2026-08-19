@@ -32,11 +32,12 @@ export const storySchema = z.object({
   executiveSummary: z.string().describe("A 2-3 sentence overview of the dataset's most important findings"),
   keyTakeaways: z.array(
     z.object({
-      title: z.string(),
-      detail: z.string(),
-      metricImpact: z.string().optional().describe("E.g., '+15% YoY' or 'Critical Drop'")
+      title: z.string().describe("Small label above the metric"),
+      detail: z.string().describe("A crisp, scannable 1-2 sentence explanation."),
+      metricImpact: z.string().describe("The primary number/stat to display prominently (e.g., '+15%', '$2.4M', 'Critical')"),
+      type: z.enum(['positive', 'negative', 'neutral', 'insight']).optional().describe("Used for styling. Green=positive, Red/Amber=negative, Purple/Blue=insight")
     })
-  ).describe("3-5 key actionable takeaways"),
+  ).describe("Exactly 4 key actionable takeaways for a 2x2 grid"),
   chartConfigs: z.array(
     z.object({
       chartType: z.enum(['bar', 'line', 'scatter', 'pie']),
