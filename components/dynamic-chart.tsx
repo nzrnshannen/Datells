@@ -55,7 +55,17 @@ export function DynamicChart({ config, tableName = 'dataset' }: DynamicChartProp
         }
         
         const result = await executeQuery(query);
-        setData(result);
+        let sortedResult = [...result];
+        sortedResult.sort((a, b) => {
+          const valA = a[config.xAxisKey];
+          const valB = b[config.xAxisKey];
+          if (typeof valA === 'number' && typeof valB === 'number') {
+            return valA - valB;
+          }
+          return String(valA).localeCompare(String(valB));
+        });
+        
+        setData(sortedResult);
       } catch (e: any) {
         console.error("Failed to execute chart query", e);
         setError(e.message || "Failed to load chart data");
@@ -79,15 +89,39 @@ export function DynamicChart({ config, tableName = 'dataset' }: DynamicChartProp
       return <div className="h-64 flex items-center justify-center text-slate-500">No data for this chart.</div>;
   }
 
+  const isTimestamp = (val: any) => typeof val === 'number' && val > 1000000000000;
+
+  const xAxisFormatter = (val: any) => {
+    if (isTimestamp(val)) {
+      return new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' }).format(new Date(val));
+    }
+    return val;
+  };
+
+  const tooltipLabelFormatter = (val: any) => {
+    if (isTimestamp(val)) {
+      return new Intl.DateTimeFormat('en-US', { month: 'long', day: 'numeric', year: 'numeric' }).format(new Date(val));
+    }
+    return val;
+  };
+
+  const tooltipFormatter = (value: any, name: any) => {
+    const isPricing = config.title.toLowerCase().includes('pric') || config.yAxisKey.toLowerCase().includes('price') || config.yAxisKey.toLowerCase().includes('cost');
+    if (isPricing && typeof value === 'number') {
+      return [`$${value.toFixed(2)}`, name];
+    }
+    return [value, name];
+  };
+
   const renderChart = () => {
     switch (config.chartType) {
       case 'bar':
         return (
           <BarChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} />
-            <XAxis dataKey={config.xAxisKey} stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} />
+            <XAxis dataKey={config.xAxisKey} stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} tickFormatter={xAxisFormatter} tickCount={6} />
             <YAxis stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} />
-            <Tooltip cursor={{ fill: '#334155', opacity: 0.4 }} contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #475569', borderRadius: '8px', color: '#f8fafc' }} />
+            <Tooltip cursor={{ fill: '#334155', opacity: 0.4 }} contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #475569', borderRadius: '8px', color: '#f8fafc' }} labelFormatter={tooltipLabelFormatter} formatter={tooltipFormatter} />
             <Bar dataKey={config.yAxisKey} fill="#10b981" radius={[4, 4, 0, 0]} />
           </BarChart>
         );
@@ -95,9 +129,9 @@ export function DynamicChart({ config, tableName = 'dataset' }: DynamicChartProp
         return (
           <LineChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} />
-            <XAxis dataKey={config.xAxisKey} stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} />
+            <XAxis dataKey={config.xAxisKey} stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} tickFormatter={xAxisFormatter} tickCount={6} />
             <YAxis stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} />
-            <Tooltip contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #475569', borderRadius: '8px', color: '#f8fafc' }} />
+            <Tooltip contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #475569', borderRadius: '8px', color: '#f8fafc' }} labelFormatter={tooltipLabelFormatter} formatter={tooltipFormatter} />
             <Line type="monotone" dataKey={config.yAxisKey} stroke="#3b82f6" strokeWidth={3} dot={{ r: 0 }} activeDot={{ r: 6 }} />
           </LineChart>
         );
