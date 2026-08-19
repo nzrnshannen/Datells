@@ -37,7 +37,7 @@ export const storySchema = z.object({
       metricImpact: z.string().describe("The primary number/stat to display prominently (e.g., '+15%', '$2.4M', 'Critical')"),
       type: z.enum(['positive', 'negative', 'neutral', 'insight']).optional().describe("Used for styling. Green=positive, Red/Amber=negative, Purple/Blue=insight")
     })
-  ).describe("Exactly 4 key actionable takeaways for a 2x2 grid"),
+  ).describe("Exactly 3 key actionable takeaways for a 3-column grid"),
   chartConfigs: z.array(
     z.object({
       chartType: z.enum(['bar', 'line', 'scatter', 'pie']),
