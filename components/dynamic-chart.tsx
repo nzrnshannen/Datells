@@ -3,9 +3,10 @@
 import React, { useEffect, useState } from 'react';
 import {
   BarChart, Bar, LineChart, Line, ScatterChart, Scatter, PieChart, Pie,
-  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell
+  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, Legend
 } from 'recharts';
 import { executeQuery } from '@/lib/duckdb';
+import { BarChart3 } from 'lucide-react';
 
 interface ChartConfig {
   chartType: 'bar' | 'line' | 'scatter' | 'pie';
@@ -43,13 +44,13 @@ export function DynamicChart({ config, tableName = 'dataset' }: DynamicChartProp
 
         let query = '';
         if (config.chartType === 'scatter') {
-            query = `SELECT ${safeX}, ${safeY} FROM ${tableName} LIMIT 500`;
+            query = `SELECT ${safeX} as x, ${safeY} as y FROM ${tableName} LIMIT 500`;
         } else {
             query = `
-            SELECT ${safeX}, ${aggFunc}(${safeY}) as ${safeY}
+            SELECT ${safeX} as x, ${aggFunc}(${safeY}) as y
             FROM ${tableName} 
             GROUP BY ${safeX}
-            ORDER BY ${safeX}
+            ORDER BY x
             LIMIT 50
             `;
         }
@@ -57,8 +58,8 @@ export function DynamicChart({ config, tableName = 'dataset' }: DynamicChartProp
         const result = await executeQuery(query);
         let sortedResult = [...result];
         sortedResult.sort((a, b) => {
-          const valA = a[config.xAxisKey];
-          const valB = b[config.xAxisKey];
+          const valA = a['x'];
+          const valB = b['x'];
           if (typeof valA === 'number' && typeof valB === 'number') {
             return valA - valB;
           }
@@ -82,11 +83,27 @@ export function DynamicChart({ config, tableName = 'dataset' }: DynamicChartProp
   }
 
   if (error) {
-    return <div className="h-64 flex items-center justify-center text-red-500 text-sm">Error: {error}</div>;
+    return (
+        <div className="flex flex-col h-full bg-slate-900/40 border border-slate-800 rounded-xl p-5">
+            <h4 className="text-lg font-semibold text-slate-100 mb-1">{config.title}</h4>
+            <div className="flex-1 flex items-center justify-center text-red-500 text-sm">Error: {error}</div>
+        </div>
+    );
   }
 
-  if (!data || data.length === 0) {
-      return <div className="h-64 flex items-center justify-center text-slate-500">No data for this chart.</div>;
+  const hasValidData = data && data.length > 0 && data.some(item => item.x !== undefined && item.x !== null && item.y !== undefined && item.y !== null);
+
+  if (!hasValidData) {
+      return (
+          <div className="flex flex-col h-full bg-slate-900/40 border border-slate-800 rounded-xl p-5">
+              <h4 className="text-lg font-semibold text-slate-100 mb-1">{config.title}</h4>
+              <p className="text-sm text-slate-400 mb-6">{config.description}</p>
+              <div className="flex flex-col flex-1 items-center justify-center text-slate-500 min-h-[260px]">
+                  <BarChart3 className="w-12 h-12 mb-3 opacity-30" />
+                  <p>No {config.xAxisKey.toLowerCase()} data detected</p>
+              </div>
+          </div>
+      );
   }
 
   const isTimestamp = (val: any) => typeof val === 'number' && val > 1000000000000;
@@ -119,37 +136,38 @@ export function DynamicChart({ config, tableName = 'dataset' }: DynamicChartProp
         return (
           <BarChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} />
-            <XAxis dataKey={config.xAxisKey} stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} tickFormatter={xAxisFormatter} tickCount={6} />
+            <XAxis dataKey="x" name={config.xAxisKey} stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} tickFormatter={xAxisFormatter} tickCount={6} />
             <YAxis stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} />
             <Tooltip cursor={{ fill: '#334155', opacity: 0.4 }} contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #475569', borderRadius: '8px', color: '#f8fafc' }} labelFormatter={tooltipLabelFormatter} formatter={tooltipFormatter} />
-            <Bar dataKey={config.yAxisKey} fill="#10b981" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="y" name={config.yAxisKey} fill="#10b981" radius={[4, 4, 0, 0]} />
           </BarChart>
         );
       case 'line':
         return (
           <LineChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} />
-            <XAxis dataKey={config.xAxisKey} stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} tickFormatter={xAxisFormatter} tickCount={6} />
+            <XAxis dataKey="x" name={config.xAxisKey} stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} tickFormatter={xAxisFormatter} tickCount={6} />
             <YAxis stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} />
             <Tooltip contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #475569', borderRadius: '8px', color: '#f8fafc' }} labelFormatter={tooltipLabelFormatter} formatter={tooltipFormatter} />
-            <Line type="monotone" dataKey={config.yAxisKey} stroke="#3b82f6" strokeWidth={3} dot={{ r: 0 }} activeDot={{ r: 6 }} />
+            <Line type="monotone" dataKey="y" name={config.yAxisKey} stroke="#3b82f6" strokeWidth={3} dot={{ r: 0 }} activeDot={{ r: 6 }} />
           </LineChart>
         );
       case 'scatter':
         return (
           <ScatterChart margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-            <XAxis type="number" dataKey={config.xAxisKey} name={config.xAxisKey} stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} />
-            <YAxis type="number" dataKey={config.yAxisKey} name={config.yAxisKey} stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} />
-            <Tooltip cursor={{ strokeDasharray: '3 3' }} contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #475569', borderRadius: '8px', color: '#f8fafc' }} />
-            <Scatter name="Data" data={data} fill="#f59e0b" />
+            <XAxis type="number" dataKey="x" name={config.xAxisKey} stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} tickFormatter={xAxisFormatter} />
+            <YAxis type="number" dataKey="y" name={config.yAxisKey} stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} />
+            <Tooltip cursor={{ strokeDasharray: '3 3' }} contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #475569', borderRadius: '8px', color: '#f8fafc' }} labelFormatter={tooltipLabelFormatter} formatter={tooltipFormatter} />
+            <Scatter name={config.yAxisKey} data={data} fill="#f59e0b" />
           </ScatterChart>
         );
       case 'pie':
         return (
           <PieChart>
-            <Tooltip contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #475569', borderRadius: '8px', color: '#f8fafc' }} />
-            <Pie data={data} dataKey={config.yAxisKey} nameKey={config.xAxisKey} cx="50%" cy="50%" innerRadius={60} outerRadius={80} fill="#8884d8" paddingAngle={5}>
+            <Tooltip contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #475569', borderRadius: '8px', color: '#f8fafc' }} formatter={tooltipFormatter} />
+            <Legend wrapperStyle={{ fontSize: '12px', color: '#94a3b8' }} />
+            <Pie data={data} dataKey="y" nameKey="x" cx="50%" cy="50%" innerRadius={60} outerRadius={80} fill="#8884d8" paddingAngle={5}>
                 {data.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}
@@ -163,7 +181,7 @@ export function DynamicChart({ config, tableName = 'dataset' }: DynamicChartProp
     <div className="flex flex-col h-full bg-slate-900/40 border border-slate-800 rounded-xl p-5 hover:border-slate-700 transition-colors">
         <h4 className="text-lg font-semibold text-slate-100 mb-1">{config.title}</h4>
         <p className="text-sm text-slate-400 mb-6">{config.description}</p>
-        <div className="flex-1 w-full min-h-[300px]">
+        <div className="w-full h-[320px] mt-2 relative">
             <ResponsiveContainer width="100%" height="100%">
                 {renderChart()}
             </ResponsiveContainer>
