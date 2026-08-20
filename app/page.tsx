@@ -173,7 +173,7 @@ export default function Home() {
               Datells
             </h1>
             <p className="font-sans text-base md:text-lg text-slate-300 text-center max-w-2xl mb-12 leading-relaxed">
-              Drop any CSV to instantly generate a comprehensive, AI-powered interactive data story dashboard. Processed securely in your browser.
+              Drop any CSV, Excel (.xlsx), or JSON file to instantly generate an AI-powered interactive data story dashboard. Processed securely in your browser.
             </p>
 
             <UploadDropzone onFileUpload={handleFileUpload} isLoading={isLoading} />

@@ -27,11 +27,18 @@ export function UploadDropzone({ onFileUpload, isLoading = false }: UploadDropzo
   const handleFileChange = (newFiles: File[]) => {
     if (newFiles.length > 0) {
       const selectedFile = newFiles[0];
-      if (selectedFile.name.endsWith(".csv")) {
+      const name = selectedFile.name.toLowerCase();
+      if (
+        name.endsWith(".csv") ||
+        name.endsWith(".tsv") ||
+        name.endsWith(".xlsx") ||
+        name.endsWith(".xls") ||
+        name.endsWith(".json")
+      ) {
         setFile(selectedFile);
         onFileUpload(selectedFile);
       } else {
-        alert("Please upload a valid CSV file.");
+        alert("Please upload a valid CSV, TSV, Excel, or JSON file.");
       }
     }
   };
@@ -45,7 +52,13 @@ export function UploadDropzone({ onFileUpload, isLoading = false }: UploadDropzo
   const { getRootProps, isDragActive } = useDropzone({
     multiple: false,
     noClick: true,
-    accept: { 'text/csv': ['.csv'] },
+    accept: { 
+      'text/csv': ['.csv'], 
+      'text/tab-separated-values': ['.tsv'],
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'],
+      'application/vnd.ms-excel': ['.xls'],
+      'application/json': ['.json']
+    },
     onDrop: handleFileChange,
     onDropRejected: (error) => {
       console.log(error);
@@ -62,7 +75,7 @@ export function UploadDropzone({ onFileUpload, isLoading = false }: UploadDropzo
           ref={fileInputRef}
           id="file-upload-handle"
           type="file"
-          accept=".csv"
+          accept=".csv,.tsv,.xlsx,.xls,.json"
           onChange={(e) => handleFileChange(Array.from(e.target.files || []))}
           className="hidden"
           disabled={isLoading}
@@ -103,9 +116,9 @@ export function UploadDropzone({ onFileUpload, isLoading = false }: UploadDropzo
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     layout
-                    className="px-2 py-1 rounded-md bg-slate-800 border border-slate-700/50 uppercase tracking-wider"
+                    className="px-2 py-1 rounded-md bg-slate-800 border border-slate-700/50 uppercase tracking-wider font-semibold"
                   >
-                    CSV
+                    {file.name.split('.').pop()}
                   </motion.p>
 
                   <motion.p
@@ -164,10 +177,10 @@ export function UploadDropzone({ onFileUpload, isLoading = false }: UploadDropzo
             <p className="font-sans font-semibold text-white text-xl tracking-tight hover:text-purple-400 transition-colors">
               {isLoading ? "Analyzing Dataset" : "Upload Dataset"}
             </p>
-            <p className="font-sans text-xs text-slate-400 mt-2 max-w-sm text-center">
+            <p className="font-sans text-xs text-slate-400 mt-2 max-w-sm text-center leading-relaxed">
               {isLoading 
-                ? "Processing your CSV locally using DuckDB-Wasm..." 
-                : "Drag or drop your CSV file here or click to upload. Files are processed securely in your browser."}
+                ? "Processing your dataset locally using DuckDB-Wasm..." 
+                : "Drag or drop your file here or click to upload. Processed securely in your browser."}
             </p>
           </div>
         </div>
