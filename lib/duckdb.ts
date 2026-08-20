@@ -1,4 +1,5 @@
 import * as duckdb from '@duckdb/duckdb-wasm';
+import { parseFileToJSON } from './parser';
 
 let dbInstance: duckdb.AsyncDuckDB | null = null;
 let initPromise: Promise<duckdb.AsyncDuckDB> | null = null;
@@ -33,24 +34,30 @@ export const initDuckDB = async (): Promise<duckdb.AsyncDuckDB> => {
   return initPromise;
 };
 
-// Helper function to ingest a File (CSV) into DuckDB
-export const ingestCSV = async (file: File, tableName: string = 'dataset'): Promise<void> => {
+// Helper function to ingest a File (CSV, Excel, JSON) into DuckDB
+export const ingestDataset = async (file: File, tableName: string = 'dataset'): Promise<void> => {
     const db = await initDuckDB();
     const c = await db.connect();
     
     try {
+        // Parse file to JSON array
+        const parsedData = await parseFileToJSON(file);
+        
+        // Convert to JSON string Blob
+        const jsonString = JSON.stringify(parsedData);
+        const jsonBlob = new Blob([jsonString], { type: 'application/json' });
+        const virtualFileName = `${file.name}.json`;
+        
         // Drop table if it exists
         await c.query(`DROP TABLE IF EXISTS ${tableName}`);
         
         // Register the file in DuckDB's virtual file system
-        await db.registerFileHandle(file.name, file, duckdb.DuckDBDataProtocol.BROWSER_FILEREADER, true);
+        await db.registerFileHandle(virtualFileName, jsonBlob, duckdb.DuckDBDataProtocol.BROWSER_FILEREADER, true);
         
-        // Create table from the CSV
-        await c.insertCSVFromPath(file.name, {
+        // Create table from the JSON
+        await c.insertJSONFromPath(virtualFileName, {
             schema: 'main',
             name: tableName,
-            detect: true,
-            header: true,
         });
     } finally {
         await c.close();

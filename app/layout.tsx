@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Datells | AI Data Story Dashboard",
-  description: "Drop any CSV to instantly generate a comprehensive, AI-powered interactive data story dashboard.",
+  description: "Drop any CSV, Excel (.xlsx), or JSON file to instantly generate an AI-powered interactive data story dashboard.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

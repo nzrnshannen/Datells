@@ -1,11 +1,11 @@
-import { ingestCSV, executeQuery } from './duckdb';
+import { ingestDataset, executeQuery } from './duckdb';
 import { DatasetSummary, ColumnSummary } from './schema';
 
 export async function profileDataset(file: File): Promise<DatasetSummary> {
   const tableName = 'dataset';
   
   // 1. Ingest file into DuckDB
-  await ingestCSV(file, tableName);
+  await ingestDataset(file, tableName);
 
   // 2. Get table schema (columns and types)
   const schemaQuery = `DESCRIBE ${tableName};`;
